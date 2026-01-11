@@ -236,6 +236,24 @@ if (url.pathname === "/api/meta" && request.method === "GET") {
 
       return new Response(upstream.body, { status: 200, headers });
     }
+const resp = await fetch("https://api.openai.com/v1/responses", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(payload),
+});
+
+if (!resp.ok) {
+  const txt = await resp.text();
+  console.error("OpenAI error:", resp.status, txt);
+  return json(
+    { error: "openai_error", status: resp.status, details: txt.slice(0, 2000) },
+    502,
+    corsHeaders(origin, env)
+  );
+}
 
     return new Response("Not found", { status: 404 });
   }
