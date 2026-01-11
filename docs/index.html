@@ -1,1 +1,195 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NudoAI</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Markdown + sanitize + highlight -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/github-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <canvas id="bg"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="name">NudoAI</span>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn ghost" id="btnSettings">Settings</button>
+      <button class="btn ghost" id="btnPrompts">Prompts</button>
+      <button class="btn ghost" id="btnExit">Exit</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="chat">
+      <div id="log" class="log"></div>
+
+      <form id="composer" class="composer">
+        <div class="mode-pill" id="modePill">Text generation</div>
+        <textarea id="input" rows="2" placeholder="Напиши запрос…"></textarea>
+        <div class="composer-actions">
+          <button class="btn danger" type="button" id="btnStop" disabled>Stop</button>
+          <button class="btn primary" type="submit" id="btnSend">Send</button>
+        </div>
+      </form>
+    </section>
+
+    <footer class="footer">
+      <a href="#" id="openTerms">Terms</a>
+      <span class="sep">•</span>
+      <a href="#" id="openPrivacy">Privacy</a>
+      <span class="sep">•</span>
+      <a href="#" id="openSupport">Support</a>
+    </footer>
+  </main>
+
+  <!-- Overlay / Modals -->
+  <div id="overlay" class="overlay hidden">
+
+    <!-- Region blocked screen -->
+    <div id="regionBlocked" class="modal hidden">
+      <div class="modal-head">
+        <div class="ban-icon"></div>
+        <div>
+          <div class="modal-title">App unavailable</div>
+          <div class="modal-sub">Unfortunately, NudoAI is unavailable in your region.</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>We’re sorry. Please use a VPN and try again.</p>
+        <p class="small muted">Blocked countries: Russia, Belarus, Syria, Iraq, Iran.</p>
+        <button class="btn ghost" id="btnCloseBlocked">Close</button>
+      </div>
+    </div>
+
+    <!-- Access code -->
+    <div id="codeModal" class="modal hidden">
+      <div class="modal-head">
+        <div class="modal-title">Enter access code</div>
+        <div class="modal-sub">Get it from the NudoAI Discord server.</div>
+      </div>
+      <div class="modal-body">
+        <input id="codeInput" class="text" placeholder="Access code" autocomplete="off" />
+        <div class="row">
+          <button class="btn primary" id="btnSaveCode">Continue</button>
+          <a class="btn ghost" id="btnDiscord" target="_blank" rel="noreferrer">Open Discord</a>
+        </div>
+        <div class="small muted">Code is stored locally in your browser.</div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settingsModal" class="modal hidden wide">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Settings</div>
+          <div class="modal-sub">Mode, model, and custom instructions.</div>
+        </div>
+        <button class="btn ghost" id="btnCloseSettings">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="grid">
+          <label class="field">
+            <div class="label">Mode</div>
+            <select id="modeSelect" class="text">
+              <option value="text">Text generation</option>
+              <option value="code">Coding mode</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <div class="label">Model</div>
+            <select id="modelSelect" class="text">
+              <option value="chatgpt-4o-latest">chatgpt-4o-latest</option>
+              <option value="gpt-4o">gpt-4o</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <div class="label">Show tokens & cost</div>
+            <select id="showUsage" class="text">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+
+          <label class="field full">
+            <div class="label">Custom instructions (optional)</div>
+            <textarea id="customInstructions" class="text" rows="4" placeholder="Например: ‘Всегда отвечай коротко’"></textarea>
+          </label>
+        </div>
+
+        <div class="row">
+          <button class="btn primary" id="btnSaveSettings">Save</button>
+          <button class="btn ghost" id="btnResetSettings">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompts -->
+    <div id="promptsModal" class="modal hidden wide">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Prompt templates</div>
+          <div class="modal-sub">One click to fill the input.</div>
+        </div>
+        <button class="btn ghost" id="btnClosePrompts">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="chips">
+          <button class="chip" data-prompt="Сделай сайт: (опиши дизайн, страницы, кнопки). Дай файлы index.html, styles.css, script.js.">Сделай сайт</button>
+          <button class="chip" data-prompt="Сгенерируй текст: (что именно нужно, тон, объём).">Сгенерируй текст</button>
+          <button class="chip" data-prompt="Исправь код: (вставь код) и опиши, что не работает. Верни исправленную версию.">Исправь код</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms / Privacy / Support -->
+    <div id="docModal" class="modal hidden wide">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="docTitle">Document</div>
+          <div class="modal-sub" id="docSub">—</div>
+        </div>
+        <button class="btn ghost" id="btnCloseDoc">Close</button>
+      </div>
+      <div class="modal-body" id="docBody"></div>
+    </div>
+
+    <!-- Pretty error -->
+    <div id="errorModal" class="modal hidden">
+      <div class="modal-head">
+        <div class="ban-icon"></div>
+        <div>
+          <div class="modal-title" id="errTitle">Error</div>
+          <div class="modal-sub" id="errSub">Something went wrong.</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <button class="btn ghost" id="btnCloseError">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
 
