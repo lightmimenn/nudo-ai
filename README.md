@@ -1,23 +1,45 @@
-# nudo-ai
-Nudo AI is a new programming-focused neural network, available over HTTPS, built to help developers write, improve, and ship code faster.
-# Nudo AI — App Unavailable Page
+🧠 About NudoAI
 
-**Nudo AI** is a new programming-focused neural network available over **HTTPS**.  
-This repository contains a modern “App unavailable” landing page with smooth animations and a country availability modal.
+NudoAI is an AI-powered assistant focused on text generation and basic coding support.
+It’s designed to assist with creative writing, documentation, and simple code-related tasks on platforms like GitHub.
 
-## Features
-- Centered glassmorphism card UI
-- Top navigation bar (UI only — no real routing/logic)
-- **Check available Country** button → modal with available regions/countries
-- Black background with a mouse “ban icon” trail (fade-out + slight blur, capped to prevent lag)
-- Ambient red fading spots in the background (appear/disappear softly)
-- Scrollable Europe list inside the modal with a styled scrollbar
+✍️ Text Generation
 
-## Project structure
-```txt
-project/
-  index.html
-  css/
-    style.css
-  js/
-    app.js
+NudoAI can:
+
+Generate descriptive and structured texts (articles, summaries, character bios, etc.)
+
+Write technical documentation or README files
+
+Create dialogues, storylines, or narrative elements for games and roleplay projects
+
+Rephrase, translate, or expand text while maintaining context and tone
+
+💻 Coding Assistance (Light / Weak Coding)
+
+NudoAI supports lightweight code generation — ideal for simple prototypes and automation scripts.
+It can:
+
+Write or edit small code snippets (HTML, CSS, JavaScript, Python, Markdown, etc.)
+
+Suggest syntax fixes and structural improvements
+
+Generate starter templates for GitHub projects
+
+Help write or format configuration files (JSON, YAML, .env, etc.)
+
+However, NudoAI is not a full coding engine:
+
+It may not handle complex algorithms or large-scale software systems
+
+Code produced should be reviewed and tested manually before use in production
+
+⚙️ Typical Use Cases
+
+Writing documentation for GitHub repositories
+
+Creating text content for wikis or blogs
+
+Generating small web components or interface mockups
+
+Drafting structured posts or roleplay materials
