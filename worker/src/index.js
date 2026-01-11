@@ -222,12 +222,16 @@ if (url.pathname === "/api/meta" && request.method === "GET") {
         body: JSON.stringify(payload)
       });
 
-      // Если OpenAI вернул ошибку — отдаём JSON (не стрим)
-      if (!upstream.ok) {
-        let errJson = {};
-        try { errJson = await upstream.json(); } catch {}
-        return json({ error: "openai_error", details: errJson }, 502, headers);
-      }
+if (!upstream.ok) {
+  const txt = await upstream.text();
+  console.error("OpenAI upstream error", upstream.status, txt);
+  return json(
+    { error: "openai_error", status: upstream.status, details: txt.slice(0, 2000) },
+    502,
+    headers
+  );
+}
+
 
       // Проксируем SSE поток “как есть”
       headers.set("Content-Type", "text/event-stream; charset=utf-8");
