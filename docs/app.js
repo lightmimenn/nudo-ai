@@ -1,6 +1,6 @@
 // ====== CONFIG ======
-const WORKER_BASE = "https://YOUR_WORKER_SUBDOMAIN.workers.dev"; // <-- вставишь после деплоя воркера
-const DISCORD_INVITE = "https://discord.gg/YOUR_INVITE"; // <-- вставь инвайт
+const WORKER_BASE = "https://autumn-cloud-bb9a.lajthundis.workers.dev/"; // <-- вставишь после деплоя воркера
+const DISCORD_INVITE = "https://discord.gg/h5Sg6CtxWD"; // <-- вставь инвайт
 
 // banned topics quick client-side (очень грубо; основная защита — на модели)
 const BANNED_HINTS = [
