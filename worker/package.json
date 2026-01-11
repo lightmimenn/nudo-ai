@@ -1,1 +1,13 @@
+{
+  "name": "nudoai-worker",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  }
+}
 
