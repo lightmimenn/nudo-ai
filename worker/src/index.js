@@ -106,33 +106,35 @@ export default {
     }
 
     // Meta: страна + блок
-    if (url.pathname === "/api/meta" && request.method === "GET") {
-      if (!allowOrigin) return json({ error: "cors_blocked" }, 403, headers);
+if (url.pathname === "/api/meta" && request.method === "GET") {
+  const country = getCountry(request);
+  const blocked = BLOCKED_COUNTRIES.has(country);
 
-      const country = getCountry(request);
-      const blocked = BLOCKED_COUNTRIES.has(country);
+  // Сделаем meta доступным для прямого открытия в браузере:
+  // если Origin нет — разрешаем всем (только для /api/meta).
+  const h = new Headers(headers);
+  if (!origin) h.set("Access-Control-Allow-Origin", "*");
 
-      return json(
-        {
-          country,
-          blocked,
-          blockedCountries: Array.from(BLOCKED_COUNTRIES),
-          defaultModel: env.DEFAULT_MODEL || "chatgpt-4o-latest",
-          limits: {
-            maxOutputTokens: clampInt(env.MAX_OUTPUT_TOKENS, 2000, 200, 4000),
-            maxInputChars: clampInt(env.MAX_INPUT_CHARS, 8000, 1000, 20000),
-            rateLimitPerMin: clampInt(env.RATE_LIMIT_PER_MIN, 10, 1, 120),
-          },
-          // Для оценки стоимости (chatgpt-4o-latest: $5 input / $15 output per 1M). :contentReference[oaicite:3]{index=3}
-          pricingUsdPer1M: {
-            "chatgpt-4o-latest": { input: 5.0, output: 15.0 },
-            "gpt-4o": { input: 2.5, output: 10.0 }
-          }
-        },
-        200,
-        headers
-      );
-    }
+  return json(
+    {
+      country,
+      blocked,
+      blockedCountries: Array.from(BLOCKED_COUNTRIES),
+      defaultModel: env.DEFAULT_MODEL || "chatgpt-4o-latest",
+      limits: {
+        maxOutputTokens: clampInt(env.MAX_OUTPUT_TOKENS, 2000, 200, 4000),
+        maxInputChars: clampInt(env.MAX_INPUT_CHARS, 8000, 1000, 20000),
+        rateLimitPerMin: clampInt(env.RATE_LIMIT_PER_MIN, 10, 1, 120),
+      },
+      pricingUsdPer1M: {
+        "chatgpt-4o-latest": { input: 5.0, output: 15.0 },
+        "gpt-4o": { input: 2.5, output: 10.0 }
+      }
+    },
+    200,
+    h
+  );
+}
 
     // Chat stream
     if (url.pathname === "/api/chat" && request.method === "POST") {
